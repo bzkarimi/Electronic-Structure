@@ -1,4 +1,4 @@
-# cisd
+# Configuration Interaction With Single and Double Excitations
 A simple CISD code
 
 Copyright &copy; 2016 Borna Zandkarimi  
