@@ -1,0 +1,130 @@
+!====================================================
+!                  SOME GENERAL COMMENTS
+!----------------------------------------------------
+!* All calculations are done in atomic units.
+!* Contracted Gaussian functions are used as basis sets.
+!* The basis set should be in a file named "Basis.txt".
+
+!* You just need to change the name of prepared basis set files to “Basis.txt”,
+! or copy the text of these prepared basis set files to the “Basis.txt”.
+
+!* The geometry will be saved in a file named "Input.xyz" in the XYZ format.
+!* The final results will be saved in a file named "Output.txt".
+!* The initial values of input data can be changed in the “allocate-array.f90”.
+!* LAPACK library needs to be installed. The path to it can be changed in the "make" file.
+
+!====================================================
+
+!====================================================
+!            VARIABLES(ALPHABETICAL ORDER)
+!----------------------------------------------------
+!
+! a = side length of the polygon(bond length)
+! alpha(i,j) = Guassian exponent for atom "i" and primitive "j"
+! alpha1 = Scaling factor for DGEMM subroutine
+! atomname = name of the atom
+! beta1 = Scaling factor for DGEMM subroutine
+! bond_incr = bond increment (for plotting total energy vs bond length)
+
+! CI = 1,2,3,...(singles,doubles,triples,....) for CIS,CISD,...
+! coeff(i,j) = Contraction coefficient for atom "i" and primitive "j"
+! Converge = whenever (delta < Converge) this means that our result is in the desired interval
+! d,d1,d2,d3 = distances between centers
+! delta = standard deviation for change in density matrix
+! Eigen_C/Eigen_C_prime = Eigen vectors of Fock/transformed Fock Matrix
+! eigen_c_occ/eigen_c_occ_T = Eigen vectors of occupied MO's of Fock/transposed Fock Matrix
+! Eigen_value() = Eigenvalues of matrix
+! E_value() = Eigenvalues of matrix
+
+! EN = Electronic energy
+! EN_t = total energy
+! F(),F_Prime() = Fock Matrix before/after transformation
+! G() = 2e part of Fock Matrix
+! Gama/Gama_temp = Projection in MO basis
+! Gama_t = Just a matrix to calclate
+! geo = if geo = 1 the geometry would be polygon, if geo = 2 the geometry will be grid
+! H_core() = core H matrix
+! Integral = output of 2e-integral
+! itemp = temporary counter for total basis
+! jtemp = temporary counter for total basis
+! KE,KE_t = Kinetic energy(primitive)/total
+! ktemp = temporary counter for total basis
+! ltemp = temporary counter for total basis
+! M_2e() = Total matrix regarding to 2e-integrals
+! max_it = maximum iteration
+! max_bondlength = maximum bond length for which we are going to calculate the total energy
+! natom = number of atom
+! nbas = number of Gaussian primitives on each atom
+! norbit = number of atomic basis on each atom
+! norbit_t = total number of basis
+! N_elec = number of electrons calculated by Tr(PS)
+! nelec = number of electrons
+! n_fragment = Num of fragments
+! norbit_fci = number of orbitals in FCI
+! nside = number of polygon sides
+! P_new() = New Density Matrix
+! P_old() = Old Density Matrix
+! P_new() = New Density Matrix
+! Project_new = Projection matrix : S_prime_T * S_A(-1) * S_prime
+! PE,PE_t = Potential energy(primitive)/total
+! R(i,j) = Distance between the nuclei "i" and "j"
+! S,S_M = Overlap Integral : each primitive/Matrix
+! S_A = Fraction of the Overlap matrix (atom_basis,atom_basis)
+! S_prime/S_prime_T = Fraction of the Overlap matrix (norbit_t,atom_basis)
+
+! step = the number of iterations
+! title = title of the basis
+! Tr_P/Tr_K = trace of Potential/kinetic matrix
+! threshold_HF/threshold_OEP = density threshold for HF/OEP
+
+! U() = Unitary Matrix
+! X() = Matrix Transformation
+! xp,yp,zp = Coordinates of P
+! xq,yq,zq = Coordinates of Q
+! Z(i) = Nuclear charge for atom i
+! Zeta(i) = Slater exponent for atom i
+!
+!====================================================
+
+!====================================================
+!             SUBROUTINES(ALPHABETICAL ORDER)
+!----------------------------------------------------
+!
+
+! 1. DGEMM('N','N',M,N,K,alpha,A,LDA,B,LDB,beta,C,LDC) = Lapack Subroutine
+!    Calculates C = alpha*A*B + beta*C
+!
+! 2. Distance(x1,y1,z1,x2,y2,z2,d) = Calculates the distance between atom 1 and 2
+!
+! 3. DSYEV('V', 'U', norbit_t, U, norbit_t, Eigen_value, WORK, LWORK, INFO) = Lapack Subroutine
+!    Calculates the eigenvalues and eigenvectors of U
+!
+! 4. F0(t,F_0) = A function related to error function to calculate integrals
+!
+! 5. Grid(m,n,r) = Produces a grid with m rows and n columns with bond length of r
+!
+! 6. Input(natom,nbas) = Reads number of atoms and basis
+!
+! 7. Integral_2e(a,b,c,d,r1,r2,r3,Integral) = Calculates 2e integrals using 4 exponents: a,b,c,d and 3 distances:
+!    r1 = R(A,B), r2 = R(C,D), r3 = R(P,Q) see fig below
+!
+! 8. Kinetic(a,b,d,KE) = Calculates Kinetic Energy integral using 2 exponents: a,b, and 1 distance:
+!    r1 = R(A,B) see fig below
+!
+! 9. Overlap(a,b,d,S) = Calculates the overlap integral using exponents a,b and the distance d
+!
+! 10. Polygon(n,a) = It generates an equilateral polygon with n sides and length a with the origin
+!    at the center of circumscrimbed circle, and saves the results in a file named "Input.xyz"
+!
+! 11. Potential(a,b,Z,d1,d2,PE) = Calculates Potential Energy integral using 2 exponents: a,b, and 2 distances:
+!     d1 = R(A,B), d2 = R(P,C) see fig below
+
+
+!====================================================
+!             FIGURE OF 4-CENTER INTEGRAL
+!----------------------------------------------------
+!        A------------P----B
+!        C----------Q------D
+!
+!     A,B,C,D are centers for integration
+!====================================================
