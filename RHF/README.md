@@ -1,4 +1,4 @@
-# RHF
+# Restricted Hartree-Fock (RHF)
 
 A simple RHF code
 
